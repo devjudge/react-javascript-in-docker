@@ -1,11 +1,21 @@
-FROM ubuntu:latest
+FROM node:12.7.0
 
-RUN apt-get update
-RUN apt-get install -y nodejs
-RUN apt-get install -y npm
+# set working directory
+WORKDIR /app
 
-COPY . /var/app
+# add `/app/node_modules/.bin` to $PATH
+ENV PATH /app/node_modules/.bin:$PATH
 
-WORKDIR /var/app
+# install and cache app dependencies
+COPY package.json /app/package.json
+RUN npm install
+RUN npm install -g http-server
 
-CMD npm start
+# add app
+COPY . /app
+
+RUN npm run build
+RUN ls
+
+RUN chmod 777 start.sh
+CMD "./start.sh"
